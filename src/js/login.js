@@ -91,7 +91,7 @@ export default {
         },
         pwd_login() {
             /*密码登录*/
-            if (this.input_username !== "" && /^(?=.*[a-zA-Z])[.a-zA-Z_0-9]{6,16}$/g.test(this.input_password)) {
+            if (this.input_username !== "" ) {
                 let data = this
                 axios(
                     {
@@ -102,9 +102,7 @@ export default {
                     if (a.data === "") {
                         data.pop("账号或密码错误")
                     } else {
-                        console.log(a.data);
-                        console.log(JSON.stringify(a.data))
-                        sessionStorage.setItem("user", JSON.stringify(a.data))
+                        localStorage.setItem("user", JSON.stringify(a.data))
                         data.input_password = "";
                         data.input_username = ""
                         location.href = `http://${Conf.src}/chat.html`
@@ -128,7 +126,10 @@ export default {
                             that.input_password=""
                             that.input_username=""
                         }else {
-                            console.log(a.data)
+                            localStorage.setItem("user", JSON.stringify(a.data))
+                            that.input_password = "";
+                            that.input_username = ""
+                            location.href = `http://${Conf.src}/chat.html`
                         }
                 })
 
@@ -141,7 +142,7 @@ export default {
                     this.sms_btn = "btn_primary disable"
                 }
             } else {
-                if (this.input_username !== "" && /^(?=.*[a-zA-Z])[a-zA-Z_0-9]{6,16}$/g.test(this.input_password)) {
+                if (this.input_username !== "" ) {
                     if (this.newUser) {
                         if (this.input_name !== ""&&/^(?=.*[a-zA-Z])[a-zA-Z_0-9]{6,16}$/g.test(this.input_username)) {
                             this.login_btn = "btn_primary"
@@ -155,12 +156,20 @@ export default {
             }
         },
         logon(){
+            let that=this
             axios(
                 {
                     method: 'POST',
                     url: `http://${Conf.address}/newUser?username=${this.input_username}&password=${this.input_password}&mail=${this.mail}&code=${this.code}&name=${this.input_name}`
                 }).then(function (a) {
-
+                    if (a.data===false){
+                        that.pop("账号重复")
+                    }else {
+                        localStorage.setItem("user", JSON.stringify(a.data))
+                        that.input_password = "";
+                        that.input_username = ""
+                        location.href = `http://${Conf.src}/chat.html`
+                    }
             })
         }
     }
